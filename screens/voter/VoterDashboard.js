@@ -4,10 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase/firebaseConfig'; // Import Firebase config
-import BuyerProfile from './BuyerProfile'; 
+import VoterProfile from './VoterProfile';
 import VoterVotes from './VoterVotes';
 import VoterHome from './VoterHome';
-//import TrackMedication from './TrackMedication';
 import ElectionsDiscovery from './ElectionsDiscovery';
 
 const Tab = createBottomTabNavigator();
@@ -66,7 +65,7 @@ export default function VoterDashboard() {
       <Tab.Screen name="Home" component={VoterHome} />
       <Tab.Screen name="Elections Discovery" component={ElectionsDiscovery} />
       <Tab.Screen name="Your Votes" component={VoterVotes} />
-      <Tab.Screen name="Profile" component={BuyerProfile} />
+      <Tab.Screen name="Profile" component={VoterProfile} />
     </Tab.Navigator>
   );
 }

@@ -25,9 +25,6 @@ export default function OnboardingScreen() {
             if (userType === 'voter') {
               Alert.alert(`Welcome back ${userData.fullName}`, 'You have already logged in');
               navigation.replace('VoterDashboard');
-            } else if (userType === 'vendor') {
-              Alert.alert(`Welcome back Vendor ${userData.fullName}`, 'You have already logged in');
-              navigation.replace('VendorDashboard');
             } else if (userType === 'admin') {
               Alert.alert(`Welcome back Super Admin ${userData.fullName}`, 'You have already logged in');
               navigation.replace('AdminDashboard');

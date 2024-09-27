@@ -3,14 +3,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
-import VendorSignupScreen from '../screens/VendorSignupScreen';
 
 import VoterDashboard from '../screens/voter/VoterDashboard';
 import ElectionsDiscovery from '../screens/voter/ElectionsDiscovery'
 
 import AdminDashboard from '../screens/admin/AdminDashboard';
 
-import VendorDashboard from '../screens/vendor/VendorDashboard'
 
 const Stack = createStackNavigator();
 
@@ -29,12 +27,10 @@ export default function AppNavigator() {
        // options={{ title: 'Login' }}
       />
       <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="VendorSignup" component={VendorSignupScreen} options={{ headerShown: false }}  /* options={{ title: 'Vendor Signup' }} */ />
-      {/* Buyer Portal */}
+      {/* Voter Portal */}
       <Stack.Screen name="VoterDashboard" component={VoterDashboard} options={{ headerShown: false }} />
       <Stack.Screen name="ElectionsDiscovery" component={ElectionsDiscovery} options={{ headerShown: true }} />
-      {/* Vendor Portal */}
-      <Stack.Screen name="VendorDashboard" component={VendorDashboard} options={{ headerShown: false }} />
+      
       {/* Admin Portal */}
       <Stack.Screen name="AdminDashboard" component={AdminDashboard} options={{ headerShown: false }} />
     </Stack.Navigator>

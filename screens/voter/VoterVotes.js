@@ -137,6 +137,19 @@ const VoterVotes = () => {
     }
   };
 
+/*
+  if (!selectedElection || electionResults.length === 0) return null;
+  
+    // Find the candidate with the highest votes
+    const winnerCandidate = electionResults.reduce((prev, current) => {
+      return current.votes > prev.votes ? current : prev;
+    });
+  
+    // Check if the election is still in progress or ended
+    const currentDate = new Date();
+    const isElectionInProgress = selectedElection.endDate.toDate() > currentDate;
+*/
+
   const renderElectionCard = ({ item }) => (
     <TouchableOpacity onPress={() => openElectionModal(item)} style={styles.electionCard}>
       <Image source={{ uri: item.image }} style={styles.electionImage} />
@@ -225,6 +238,16 @@ const VoterVotes = () => {
                     Total Votes: {electionResults.reduce((sum, candidate) => sum + candidate.votes, 0)}
                   </Text>
                 </View>
+                {/* Display winning or leading candidate 
+        {isElectionInProgress ? (
+          <Text style={styles.winnerText}>
+            {winnerCandidate.name} is winning the election with {winnerCandidate.votes} votes.
+          </Text>
+        ) : (
+          <Text style={styles.winnerText}>
+            {winnerCandidate.name} won the election with {winnerCandidate.votes} votes.
+          </Text>
+        )} */}
               </ScrollView>
               <TouchableOpacity
                 style={styles.closeButton}
@@ -425,6 +448,15 @@ const styles = StyleSheet.create({
     color: '#FF6347',
     marginLeft: 2,
     fontWeight: 'bold',
+  },
+
+
+  winnerText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#4caf50', // Green color to indicate the winner
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 

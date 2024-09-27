@@ -23,6 +23,7 @@ import {
   doc,
   getDoc,
   Timestamp,
+  onSnapshot,
 } from 'firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -51,13 +52,30 @@ const ElectionsDiscovery = () => {
 
   const currentUserId = auth.currentUser.uid;
 
+  const [userDetails, setUserDetails] = useState({});
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          setUserDetails(userDoc.data());
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+
   useEffect(() => {
     fetchElections();
   }, []);
 
+  /*
   const fetchElections = async () => {
     const currentDate = new Date();
-    const electionsQuery = query(collection(db, 'elections')/*, where('endDate', '>=', currentDate)*/);
+    const electionsQuery = query(collection(db, 'elections'), where('endDate', '>=', currentDate));
     const querySnapshot = await getDocs(electionsQuery);
     const electionsData = [];
     querySnapshot.forEach((doc) => {
@@ -65,6 +83,34 @@ const ElectionsDiscovery = () => {
     });
     setElections(electionsData);
   };
+  */
+
+  const fetchElections = async () => {
+    const currentDate = new Date();
+  
+    // Listen to the changes in the 'elections' collection
+    const unsubscribe = onSnapshot(collection(db, 'elections'), (snapshot) => {
+      const electionsData = [];
+  
+      snapshot.forEach((doc) => {
+        const election = { id: doc.id, ...doc.data() };
+  
+        // Check if the election's faculty is 'all' or matches the user's faculty
+        if (
+          election.endDate.toDate() >= currentDate && // Check if election is not expired
+          (election.faculty === userDetails.faculty || election.faculty === 'all')
+        ) {
+          electionsData.push(election);
+        }
+      });
+  
+      // Update the state with filtered elections
+      setElections(electionsData);
+    });
+  
+    return unsubscribe; // Call this to stop listening when necessary
+  };
+  
 
   const checkIfVoted = async (electionId) => {
     const userVotesQuery = query(
@@ -86,6 +132,7 @@ const ElectionsDiscovery = () => {
         userId: currentUserId,
         electionId,
         candidate,
+        voterName: userDetails.fullName,
         timestamp: Timestamp.now(),
       });
       Alert.alert('Success', `You voted for ${candidate.name}`);
@@ -186,7 +233,7 @@ const ElectionsDiscovery = () => {
 
 
   
-
+/*
   const renderResultsCard = () => (
     <View>
       <Text style={styles.resultTitle}>Election Results</Text>
@@ -207,7 +254,52 @@ const ElectionsDiscovery = () => {
       </Text>
     </View>
   );
+  */
+
+  const renderResultsCard = () => {
+    if (!selectedElection || electionResults.length === 0) return null;
   
+    // Find the candidate with the highest votes
+    const winnerCandidate = electionResults.reduce((prev, current) => {
+      return current.votes > prev.votes ? current : prev;
+    });
+  
+    // Check if the election is still in progress or ended
+    const currentDate = new Date();
+    const isElectionInProgress = selectedElection.endDate.toDate() > currentDate;
+  
+    return (
+      <View>
+        <Text style={styles.resultTitle}>Election Results</Text>
+        {electionResults.map((candidate, index) => (
+          <View key={index} style={styles.resultCard}>
+            <Image source={{ uri: candidate.image }} style={styles.candidateCardImage} />
+            <Text style={styles.candidateName}>{candidate.name}</Text>
+            <View style={styles.progressBarContainer}>
+              <View style={[styles.progressBar, { width: `${candidate.percentage}%` }]} />
+            </View>
+            <Text style={styles.candidateVotes}>
+              {candidate.votes} votes ({candidate.percentage}%)
+            </Text>
+          </View>
+        ))}
+        <Text style={styles.totalVotes}>
+          Total Votes: {electionResults.reduce((sum, candidate) => sum + candidate.votes, 0)}
+        </Text>
+  
+        {/* Display winning or leading candidate */}
+        {isElectionInProgress ? (
+          <Text style={styles.winnerText}>
+            {winnerCandidate.name} is winning the election with {winnerCandidate.votes} votes.
+          </Text>
+        ) : (
+          <Text style={styles.winnerText}>
+            {winnerCandidate.name} won the election with {winnerCandidate.votes} votes.
+          </Text>
+        )}
+      </View>
+    );
+  };
   
   const renderElectionCard = ({ item }) => (
     <TouchableOpacity onPress={() => openElectionModal(item)} style={styles.electionCard}>
@@ -267,19 +359,19 @@ const ElectionsDiscovery = () => {
                   <Image source={{ uri: selectedElection.image }} style={styles.modalImage} />
                   <Text style={styles.modalTitle}>{selectedElection.electionName}</Text>
                   <View style={styles.dcontainer}>
-      <View style={styles.dateContainer}>
-        <Ionicons name="calendar-outline" size={24} color="#007BFF" />
-        <Text style={styles.startDate}>
-          Start Date: {formatDate(selectedElection.startDate.toDate())}
-        </Text>
-      </View>
-      <View style={styles.dateContainer}>
-        <Ionicons name="time-outline" size={24} color="#FF6347" />
-        <Text style={styles.endDate}>
-          End Date: {formatDate(selectedElection.endDate.toDate())}
-        </Text>
-      </View>
-    </View>
+                    <View style={styles.dateContainer}>
+                      <Ionicons name="calendar-outline" size={24} color="#007BFF" />
+                      <Text style={styles.startDate}>
+                        Start Date: {formatDate(selectedElection.startDate.toDate())}
+                      </Text>
+                    </View>
+                    <View style={styles.dateContainer}>
+                      <Ionicons name="time-outline" size={24} color="#FF6347" />
+                      <Text style={styles.endDate}>
+                        End Date: {formatDate(selectedElection.endDate.toDate())}
+                      </Text>
+                    </View>
+                  </View>
                   {hasVoted ? (
                     renderResultsCard()
                   ) : (
@@ -374,7 +466,7 @@ const styles = StyleSheet.create({
   progressBarContainer: { height: 8, backgroundColor: '#e0e0e0', borderRadius: 4, overflow: 'hidden', marginTop: 4, marginBottom: 4 },
   progressBar: { height: '100%', backgroundColor: '#4caf50' },
   candidateVotes: { fontSize: 16, fontWeight: 'bold', marginTop: 4 },
-  totalVotes: { textAlign: 'center', fontSize: 16, marginTop: 8 },
+  totalVotes: {  fontSize: 20, fontWeight: 'bold', textAlign: 'center', fontSize: 16, marginTop: 8 },
 
   
   searchContainer: {
@@ -435,6 +527,14 @@ const styles = StyleSheet.create({
     color: '#FF6347',
     marginLeft: 2,
     fontWeight: 'bold',
+  },
+
+  winnerText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#4caf50', // Green color to indicate the winner
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 

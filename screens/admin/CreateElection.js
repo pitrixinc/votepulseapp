@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -18,8 +18,10 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
 } from 'firebase/firestore';
-import { db, storage } from '../../firebase/firebaseConfig';
+import { auth, db, storage } from '../../firebase/firebaseConfig';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function CreateElection() {
@@ -35,6 +37,21 @@ export default function CreateElection() {
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'error' or 'success'
+
+  const [userDetails, setUserDetails] = useState({});
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          setUserDetails(userDoc.data());
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const onChangeStartDate = (event, selectedDate) => {
     setShowStartDatePicker(false);
@@ -144,6 +161,7 @@ export default function CreateElection() {
     return await getDownloadURL(imageRef);
   };
 
+  /*
   // Handle form submission
   const handleSubmit = async () => {
     if (!electionName || !startDate || !endDate || !faculty || candidates.length === 0) {
@@ -176,6 +194,12 @@ export default function CreateElection() {
         faculty,
         image: electionImageUrl,
         candidates: candidateData,
+        adminId: auth.currentUser.uid,
+        adminName: userDetails.fullName,
+        adminEmail: userDetails.email,
+        adminProfileImage: userDetails.profileImage,
+        adminLocation: userDetails.location,
+        createdAt: new Date().toDateString(),
       });
 
       // Clear form and show success alert
@@ -191,6 +215,61 @@ export default function CreateElection() {
       console.error('Error creating election:', error);
     }
   };
+*/
+
+const handleSubmit = async () => {
+  if (!electionName || !startDate || !endDate || !faculty || candidates.length === 0) {
+    Alert.alert('Error', 'Please fill all fields and add at least one candidate.');
+    return;
+  }
+
+  try {
+    // Upload election image
+    const electionImageUrl = await uploadImageToStorage(image, 'elections');
+
+    // Upload candidate images and prepare candidate data
+    const candidateData = await Promise.all(
+      candidates.map(async (candidate) => {
+        const candidateImageUrl = await uploadImageToStorage(candidate.image, 'candidates');
+        return {
+          name: candidate.name,
+          image: candidateImageUrl,
+          faculty: candidate.faculty,
+          level: candidate.level
+        };
+      })
+    );
+
+    // Create election in Firestore
+    const docRef = await addDoc(collection(db, 'elections'), {
+      electionName,
+      startDate,
+      endDate,
+      faculty,
+      image: electionImageUrl,
+      candidates: candidateData,
+      adminId: auth.currentUser.uid,
+      adminName: userDetails.fullName,
+      adminEmail: userDetails.email,
+      adminProfileImage: userDetails.profileImage,
+      adminLocation: userDetails.location,
+      createdAt: new Date().toDateString(),
+    });
+
+    // Clear form and show success alert
+    setElectionName('');
+    setStartDate('');
+    setEndDate('');
+    setFaculty('');
+    setImage(null);
+    setCandidates([{ name: '', image: null, faculty: '', level: '' }]);
+    Alert.alert('Success', 'Election created successfully!');
+  } catch (error) {
+    Alert.alert('Error', 'An error occurred while creating the election.');
+    console.error('Error creating election:', error.message, error.stack);
+  }
+};
+
 
   return (
     <ScrollView style={styles.container}>
@@ -254,9 +333,9 @@ export default function CreateElection() {
         style={styles.picker}
       >
         <Picker.Item label="Select Faculty" value="" />
-        <Picker.Item label="Science" value="Science" />
-        <Picker.Item label="Arts" value="Arts" />
-        <Picker.Item label="Engineering" value="Engineering" />
+        <Picker.Item label="FoCIS" value="FoCIS" />
+        <Picker.Item label="FoE" value="FoE" />
+        <Picker.Item label="Business" value="Business" />
       </Picker>
 
       <Text style={styles.subtitle}>Candidates</Text>

@@ -8,7 +8,7 @@ import { auth, db } from '../../firebase/firebaseConfig'; // Import Firebase con
 import AdminProfile from './AdminProfile'
 import AdminHome from './AdminHome';
 import CreateElection from './CreateElection'
-import ManageMedications from './ManageMedications';
+import Activities from './Activities';
 import ManageUsers from './ManageUsers';
 
 
@@ -46,13 +46,16 @@ export default function AdminDashboard() {
 
           let iconName;
           switch (route.name) {
-            case 'Manage Users':
+            case 'Manage Elections':
               iconName = 'bookmarks-outline';
               break;
-            case 'Create Election':
-              iconName = 'fast-food-outline';
+              case 'Manage Users':
+              iconName = 'people-outline';
               break;
-            case 'Admin Home':
+            case 'Create Election':
+              iconName = 'add-circle-outline';
+              break;
+            case 'Home':
               iconName = 'home-outline';
               break;
             default:
@@ -65,8 +68,10 @@ export default function AdminDashboard() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen name="AdminHome" component={AdminHome} />
+      <Tab.Screen name="Home" component={Activities} />
+      
       <Tab.Screen name="Create Election" component={CreateElection} />
+      <Tab.Screen name="Manage Elections" component={AdminHome} />
       <Tab.Screen name="Manage Users" component={ManageUsers} />
       <Tab.Screen name="Profile" component={AdminProfile} />
     </Tab.Navigator>

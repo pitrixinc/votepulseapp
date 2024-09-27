@@ -6,7 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
-  const [selectedTab, setSelectedTab] = useState('buyer');
+  const [selectedTab, setSelectedTab] = useState('voter');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function ManageUsers() {
     try {
       await deleteDoc(doc(db, 'users', userId));
       setUsers(users.filter(user => user.id !== userId));
-      Alert.alert('Success', 'User has been successfully deletede.');
+      Alert.alert('Success', 'User has been successfully deleted.');
     } catch (error) {
       console.error('Error deleting user:', error);
     }
@@ -38,7 +38,7 @@ export default function ManageUsers() {
       const userDoc = doc(db, 'users', userId);
       await updateDoc(userDoc, updatedData);
       setUsers(users.map(user => user.id === userId ? { ...user, ...updatedData } : user));
-      Alert.alert('Success', 'User has been successfully updated.');
+   //   Alert.alert('Success', 'User has been successfully updated.');
     } catch (error) {
       console.error('Error updating user:', error);
     }
@@ -67,17 +67,12 @@ export default function ManageUsers() {
 
       <View style={styles.tabContainer}>
         <TouchableOpacity 
-          style={[styles.tab, selectedTab === 'buyer' && styles.activeTab]}
-          onPress={() => setSelectedTab('buyer')}
+          style={[styles.tab, selectedTab === 'voter' && styles.activeTab]}
+          onPress={() => setSelectedTab('voter')}
         >
-          <Text style={styles.tabText}>Buyer</Text>
+          <Text style={styles.tabText}>Voters</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tab, selectedTab === 'vendor' && styles.activeTab]}
-          onPress={() => setSelectedTab('vendor')}
-        >
-          <Text style={styles.tabText}>Vendor</Text>
-        </TouchableOpacity>
+        
         <TouchableOpacity 
           style={[styles.tab, selectedTab === 'admin' && styles.activeTab]}
           onPress={() => setSelectedTab('admin')}
@@ -126,7 +121,7 @@ export default function ManageUsers() {
                   style={styles.picker}
                   onValueChange={(itemValue) => handleUpdate(user.id, { userType: itemValue })}
                 >
-                  <Picker.Item label="Buyer" value="buyer" />
+                  <Picker.Item label="Voter" value="voter" />
                   <Picker.Item label="Admin" value="admin" />
                 </Picker>
 

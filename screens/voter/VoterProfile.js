@@ -5,7 +5,7 @@ import { auth, db } from '../../firebase/firebaseConfig';
 import { signOut } from 'firebase/auth'; // Import signOut function from Firebase
 import { useNavigation } from '@react-navigation/native';
 
-export default function BuyerProfile() {
+export default function VoterProfile() {
   const navigation = useNavigation();
 
   const [profile, setProfile] = useState({
