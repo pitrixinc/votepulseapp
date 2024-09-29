@@ -333,6 +333,7 @@ const handleSubmit = async () => {
         style={styles.picker}
       >
         <Picker.Item label="Select Faculty" value="" />
+        <Picker.Item label="All" value="all" />
         <Picker.Item label="FoCIS" value="FoCIS" />
         <Picker.Item label="FoE" value="FoE" />
         <Picker.Item label="Business" value="Business" />

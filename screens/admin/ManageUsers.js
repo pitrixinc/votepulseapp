@@ -84,7 +84,15 @@ export default function ManageUsers() {
       <ScrollView horizontal style={styles.tableContainer}>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderText}>Profile Image</Text>
+            <Text style={styles.tableHeaderText}
+            numberOfLines={1} // Prevent wrapping
+            ellipsizeMode="tail" // Add ellipses if text overflows
+            >Profile Image</Text>
+            <Text style={styles.tableHeaderText} numberOfLines={1} // Prevent wrapping
+            ellipsizeMode="tail" // Add ellipses if text overflows
+            >Index Number</Text>
+            <Text style={styles.tableHeaderText}>Faculty</Text>
+            <Text style={styles.tableHeaderText}>Level</Text>
             <Text style={styles.tableHeaderText}>Full Name</Text>
             <Text style={styles.tableHeaderText}>Email</Text>
             <Text style={styles.tableHeaderText}>Location</Text>
@@ -99,8 +107,31 @@ export default function ManageUsers() {
                 <Image source={{ uri: user.profileImage }} style={styles.profileImage} />
                 <TextInput
                   style={styles.input}
+                  value={user.indexNumber}
+                  onChangeText={(text) => handleUpdate(user.id, { indexNumber: text })}
+                 // numberOfLines={1} // Prevent wrapping
+                //  ellipsizeMode="tail" // Add ellipses if text overflows
+                />
+                <TextInput
+                  style={styles.input}
+                  value={user.faculty}
+                  onChangeText={(text) => handleUpdate(user.id, { faculty: text })}
+                 // numberOfLines={1} // Prevent wrapping
+                //  ellipsizeMode="tail" // Add ellipses if text overflows
+                />
+                <TextInput
+                  style={styles.input}
+                  value={user.level}
+                  onChangeText={(text) => handleUpdate(user.id, { level: text })}
+                 // numberOfLines={1} // Prevent wrapping
+                //  ellipsizeMode="tail" // Add ellipses if text overflows
+                />
+                <TextInput
+                  style={styles.input}
                   value={user.fullName}
                   onChangeText={(text) => handleUpdate(user.id, { fullName: text })}
+                //  numberOfLines={1} // Prevent wrapping
+                //  ellipsizeMode="tail" // Add ellipses if text overflows
                 />
                 {/*
                 <TextInput
@@ -110,16 +141,23 @@ export default function ManageUsers() {
                  disabled
                 />
                 */}
-                <Text style={styles.input}>{user.email}</Text>
+                <Text style={styles.input} 
+                  numberOfLines={1} // Prevent wrapping
+                  ellipsizeMode="tail" // Add ellipses if text overflows
+                  >{user.email}</Text>
                 <TextInput
                   style={styles.input}
                   value={user.location}
                   onChangeText={(text) => handleUpdate(user.id, { location: text })}
+                //  numberOfLines={1} // Prevent wrapping
+                 // ellipsizeMode="tail" // Add ellipses if text overflows
                 />
                 <Picker
                   selectedValue={user.userType}
                   style={styles.picker}
                   onValueChange={(itemValue) => handleUpdate(user.id, { userType: itemValue })}
+                // numberOfLines={1} // Prevent wrapping
+                //  ellipsizeMode="tail" // Add ellipses if text overflows
                 >
                   <Picker.Item label="Voter" value="voter" />
                   <Picker.Item label="Admin" value="admin" />
@@ -129,6 +167,8 @@ export default function ManageUsers() {
                   selectedValue={user.status}
                   style={styles.picker}
                   onValueChange={(itemValue) => handleUpdate(user.id, { status: itemValue })}
+                //  numberOfLines={1} // Prevent wrapping
+               //   ellipsizeMode="tail" // Add ellipses if text overflows
                 >
                   <Picker.Item label="Pending" value="pending" />
                   <Picker.Item label="Approved" value="approved" />
@@ -204,7 +244,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   table: {
-    width: 900,  // Adjust as per your needs
+    width: 1900,  // Adjust as per your needs
     backgroundColor: '#fff',
     borderRadius: 8,
     overflow: 'hidden',
@@ -250,6 +290,7 @@ const styles = StyleSheet.create({
   picker: {
     flex: 1,
     marginHorizontal: 5,
+    
   },
   actionsContainer: {
     flexDirection: 'row',

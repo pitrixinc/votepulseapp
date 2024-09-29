@@ -98,6 +98,7 @@ const ElectionsDiscovery = () => {
         // Check if the election's faculty is 'all' or matches the user's faculty
         if (
           election.endDate.toDate() >= currentDate && // Check if election is not expired
+          userDetails.status === 'approved' &&
           (election.faculty === userDetails.faculty || election.faculty === 'all')
         ) {
           electionsData.push(election);
